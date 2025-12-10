@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import BaseHead from '../components/BaseHead.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import InteractiveBackground from '../components/InteractiveBackground';
+
+const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} />
+  </head>
+
+  <body class="relative bg-black">
+    
+    <!-- Background (always behind everything) -->
+    <InteractiveBackground client:load />
+
+    <!-- Foreground content -->
+    <div class="relative z-10">
+      <Header />
+
+      <main class="relative z-20">
+        <article class="mx-auto max-w-4xl px-6 py-16">
+          {heroImage && (
+            <div class="hero-image mb-8">
+              <Image width={1020} height={510} src={heroImage} alt="" />
+            </div>
+          )}
+
+          <div class="prose prose-invert">
+            {pubDate && (
+              <div class="date mb-4 text-gray-400 text-sm">
+                <FormattedDate date={pubDate} />
+
+                {updatedDate && (
+                  <div class="last-updated-on">
+                    Last updated on <FormattedDate date={updatedDate} />
+                  </div>
+                )}
+              </div>
+            )}
+
+            <h1>{title}</h1>
+            <hr />
+
+            <slot />
+          </div>
+        </article>
+      </main>
+    </div>
+  </body>
+</html>

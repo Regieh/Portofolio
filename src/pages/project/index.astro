@@ -1,0 +1,167 @@
+---
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import BaseHead from "../../components/BaseHead.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+import Header from "../../components/Header.astro";
+import InteractiveBackground from "../../components/InteractiveBackground.jsx";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
+
+const posts = (await getCollection("project")).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				width: 960px;
+				position: relative;
+				z-index: 10;
+			}
+			ul {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 2rem;
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			ul li {
+				width: calc(50% - 1rem);
+				transform-style: preserve-3d;
+				transition: transform 0.15s ease-out;
+				perspective: 800px;
+			}
+			ul li:hover {
+				cursor: pointer;
+			}
+			ul li * {
+				text-decoration: none;
+				transition: 0.2s ease;
+			}
+			ul li:first-child {
+				width: 100%;
+				margin-bottom: 1rem;
+				text-align: center;
+			}
+			ul li:first-child img {
+				width: 100%;
+			}
+			ul li:first-child .title {
+				font-size: 2.369rem;
+			}
+			ul li img {
+				margin-bottom: 0.5rem;
+				border-radius: 12px;
+				transition: box-shadow 0.2s ease;
+			}
+			ul li a {
+				display: block;
+			}
+			.title {
+				margin: 0;
+				color: var(--color-primary);
+				line-height: 1;
+			}
+
+			.date {
+				margin: 0;
+				color: var(--color-secondary);
+			}
+
+			ul li a:hover h4,
+			ul li a:hover .date {
+				color: var(--color-accent);
+			}
+			ul a:hover img {
+				box-shadow: var(--box-shadow);
+			}
+
+			@media (max-width: 720px) {
+				ul {
+					gap: 0.5em;
+				}
+				ul li {
+					width: 100%;
+					text-align: center;
+				}
+				ul li:first-child {
+					margin-bottom: 0;
+				}
+				ul li:first-child .title {
+					font-size: 1.563em;
+				}
+			}
+		</style>
+	</head>
+
+	<body class="relative">
+		<!-- ⭐ Interactive Background Behind Everything -->
+		<InteractiveBackground client:load />
+
+		<Header />
+
+		<main>
+			<section>
+				<ul>
+					{
+						posts.map((post) => (
+							<li class="card">
+								<a href={`/project/${post.id}/`}>
+									{post.data.heroImage && (
+										<Image
+											width={720}
+											height={360}
+											src={post.data.heroImage}
+											alt=""
+										/>
+									)}
+									<h4 class="title">{post.data.title}</h4>
+									<p class="date">
+										<FormattedDate
+											date={post.data.pubDate}
+										/>
+									</p>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+		</main>
+
+		<!-- 🧠 Tilt Script -->
+		<script is:inline>
+			document.querySelectorAll("li.card").forEach((card) => {
+				card.addEventListener("mousemove", (e) => {
+					const rect = card.getBoundingClientRect();
+					const x = e.clientX - rect.left;
+					const y = e.clientY - rect.top;
+
+					const rotateX = (y / rect.height - 0.5) * -8;
+					const rotateY = (x / rect.width - 0.5) * 8;
+
+					card.style.transform = `
+            perspective(800px)
+            rotateX(${rotateX}deg)
+            rotateY(${rotateY}deg)
+            scale(1.03)
+          `;
+				});
+
+				card.addEventListener("mouseleave", () => {
+					card.style.transform = `
+            perspective(800px)
+            rotateX(0deg)
+            rotateY(0deg)
+            scale(1)
+          `;
+				});
+			});
+		</script>
+	</body>
+</html>

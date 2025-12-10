@@ -1,13 +1,13 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import BaseHead from "../../components/BaseHead.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+import Header from "../../components/Header.astro";
+import InteractiveBackground from "../../components/InteractiveBackground.jsx";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
 
-const posts = (await getCollection('blog')).sort(
+const posts = (await getCollection("blog")).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 ---
@@ -19,6 +19,8 @@ const posts = (await getCollection('blog')).sort(
 		<style>
 			main {
 				width: 960px;
+				position: relative;
+				z-index: 10;
 			}
 			ul {
 				display: flex;
@@ -30,6 +32,12 @@ const posts = (await getCollection('blog')).sort(
 			}
 			ul li {
 				width: calc(50% - 1rem);
+				transform-style: preserve-3d;
+				transition: transform 0.15s ease-out;
+				perspective: 800px;
+			}
+			ul li:hover {
+				cursor: pointer;
 			}
 			ul li * {
 				text-decoration: none;
@@ -49,26 +57,30 @@ const posts = (await getCollection('blog')).sort(
 			ul li img {
 				margin-bottom: 0.5rem;
 				border-radius: 12px;
+				transition: box-shadow 0.2s ease;
 			}
 			ul li a {
 				display: block;
 			}
 			.title {
 				margin: 0;
-				color: rgb(var(--black));
+				color: var(--color-primary);
 				line-height: 1;
 			}
+
 			.date {
 				margin: 0;
-				color: rgb(var(--gray));
+				color: var(--color-secondary);
 			}
+
 			ul li a:hover h4,
 			ul li a:hover .date {
-				color: rgb(var(--accent));
+				color: var(--color-accent);
 			}
 			ul a:hover img {
 				box-shadow: var(--box-shadow);
 			}
+
 			@media (max-width: 720px) {
 				ul {
 					gap: 0.5em;
@@ -86,21 +98,33 @@ const posts = (await getCollection('blog')).sort(
 			}
 		</style>
 	</head>
-	<body>
+
+	<body class="relative">
+		<!-- ⭐ Interactive Background Behind Everything -->
+		<InteractiveBackground client:load />
+
 		<Header />
+
 		<main>
 			<section>
 				<ul>
 					{
 						posts.map((post) => (
-							<li>
+							<li class="card">
 								<a href={`/blog/${post.id}/`}>
 									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
+										<Image
+											width={720}
+											height={360}
+											src={post.data.heroImage}
+											alt=""
+										/>
 									)}
 									<h4 class="title">{post.data.title}</h4>
 									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
+										<FormattedDate
+											date={post.data.pubDate}
+										/>
 									</p>
 								</a>
 							</li>
@@ -109,6 +133,35 @@ const posts = (await getCollection('blog')).sort(
 				</ul>
 			</section>
 		</main>
-		<Footer />
+
+		<!-- 🧠 Tilt Script -->
+		<script is:inline>
+			document.querySelectorAll("li.card").forEach((card) => {
+				card.addEventListener("mousemove", (e) => {
+					const rect = card.getBoundingClientRect();
+					const x = e.clientX - rect.left;
+					const y = e.clientY - rect.top;
+
+					const rotateX = (y / rect.height - 0.5) * -8;
+					const rotateY = (x / rect.width - 0.5) * 8;
+
+					card.style.transform = `
+            perspective(800px)
+            rotateX(${rotateX}deg)
+            rotateY(${rotateY}deg)
+            scale(1.03)
+          `;
+				});
+
+				card.addEventListener("mouseleave", () => {
+					card.style.transform = `
+            perspective(800px)
+            rotateX(0deg)
+            rotateY(0deg)
+            scale(1)
+          `;
+				});
+			});
+		</script>
 	</body>
 </html>

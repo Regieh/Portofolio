@@ -1,16 +1,128 @@
 ---
-title: 'First post'
-description: 'Lorem ipsum dolor sit amet'
-pubDate: 'Jul 08 2022'
-heroImage: '../../assets/blog-placeholder-3.jpg'
+title: 'Building Better Software with Clean Architecture'
+description: 'A breakdown of how I apply clean architecture, scalable patterns, and real engineering practices in my projects.'
+pubDate: '2025-12-11'
+heroImage: '../../assets/blog/clean-architecture.jpg'
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+Software engineering is more than writing code — it’s about creating systems that **last**, scale, and stay readable years down the line.  
+Coming from a background in **computer science**, with experience building real-world applications, academic projects, and freelance products, I have developed a strong understanding of how architecture impacts long-term software quality.
 
-Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc. Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra massa massa ultricies mi.
+In this article, I want to share how I approach **clean architecture**, why it matters, and how it shows up in my work.
 
-Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+---
 
-Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id cursus metus aliquam eleifend mi.
+# 🧱 What Clean Architecture Really Means
 
-Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+Clean architecture, popularized by Robert C. Martin (Uncle Bob), is based on a simple idea:
+
+> **Separate the business logic from frameworks, tools, databases, and UI.**
+
+This ensures your software remains flexible, modular, and easy to maintain regardless of tech stack changes.
+
+The architecture is typically represented as a set of concentric layers:
+
+- **Entities (Core business rules)**  
+- **Use Cases (Application rules)**  
+- **Interface Adapters (Controllers, presenters, gateways)**  
+- **Frameworks & Drivers (UI, DB, APIs, externals)**
+
+The **inner layers should never depend on outer layers**.
+
+---
+
+# 🔧 How I Apply Clean Architecture in My Projects
+
+Whether I’m building a portfolio website, a backend service, or even a game prototype, I structure my work around these principles:
+
+## **1. Separation of Concerns**
+
+Each layer has a clear purpose:
+
+- Models are decoupled from the API  
+- UI is decoupled from business logic  
+- Core logic does not rely on React, Express, or SQL schemas  
+
+This allows me to replace tools without rewriting the application.
+
+## **2. Testability First**
+
+When logic is isolated, writing unit tests becomes straightforward.  
+For example, use cases can be tested independently from UI components.
+
+This is crucial in:
+- Backend services  
+- AI/ML pipelines  
+- Game logic  
+- API integrations  
+
+<br>
+
+## **3. Technology Independence**
+
+UIs change. Frameworks get outdated. Libraries get deprecated.
+
+By keeping the **domain layer pure**, the system stays alive even when tools change.
+
+---
+
+# 🧪 Example: A Simple Clean Architecture Flow
+
+Here’s a small conceptual breakdown using Markdown to show how a feature moves through each layer.
+
+### **User wants to register.**
+
+1. **UI Layer** (React / Astro)  
+   Collects the form data, forwards it to controller.
+
+2. **Controller Layer**  
+   Validates data, forwards request to `RegisterUserUseCase`.
+
+3. **Use Case Layer**  
+   Applies rules:  
+   - Email must be unique  
+   - Password must be hashed  
+   - User must be stored  
+   Returns success or error.
+
+4. **Repository Layer**  
+   Handles communication with the database.
+
+5. **Database Layer**  
+   Executes SQL queries.
+
+Each layer has one job.  
+Each layer knows nothing about the others' implementation details.
+
+---
+
+# 🛠 My Stack & Engineering Mindset
+
+Across my academic and freelance experience, I’ve worked with:
+
+- **React, Astro, Next.js** for front-end engineering  
+- **Node.js, Laravel, Golang** for backend development  
+- **Swift, Unity, C#** during Apple Developer Academy and game projects  
+- **Wav2Vec2, PyTorch** for research on speech recognition  
+- **Version control, CI/CD, deployment pipelines**  
+- **Designing scalable app structure for startups & portfolios**
+
+Clean architecture is the common thread that ties everything together.
+
+---
+
+# 🚀 Why This Matters
+
+As an engineer, my goal isn’t just to build something that works today —  
+it’s to build systems that scale tomorrow.
+
+Clean architecture helps me:
+
+- Build flexible systems that adapt to change  
+- Ship features faster  
+- Reduce bugs  
+- Keep code organized  
+- Collaborate effectively  
+- Make technical decisions confidently  
+
+It's one of the most important skills I developed through my degree, freelance journey, and Apple Developer Academy experience.
