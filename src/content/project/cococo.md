@@ -2,7 +2,7 @@
 title: "Coco.co (Apple Developer Academy Project)"
 description: "Industry Skill Challenge"
 pubDate: "2025-9-12"
-heroImage: "../../assets/project/cococo/hero.png"
+heroImage: "../../assets/project/cococo/horizontal.png"
 techStack: ["Swift", "UIKit"]
 ---
 
@@ -15,8 +15,14 @@ Coco.co is a snorkeling booking app, focusing on how we can simulating how we wo
 - MapKit
 
 ## Visual Gallery  
-![Hero](../../assets/project/cococo/hero.png)  
-![Result](../../assets/project/cococo/result.png)  
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0;">
+
+![Hero](../../assets/project/cococo/hero.png)
+
+![Result](../../assets/project/cococo/result.png)
+
+</div>
 
 ## My Role  
-- Teach Lead
+- Tech Lead
