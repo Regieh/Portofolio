@@ -5,14 +5,29 @@ import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import InteractiveBackground from '../components/InteractiveBackground';
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, techStack } = Astro.props;
 ---
 
 <html lang="en">
   <head>
     <BaseHead title={title} description={description} />
+    <style>
+      .tech-stack {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .tech-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        background: var(--color-accent);
+        color: white;
+        border-radius: 4px;
+        opacity: 0.8;
+      }
+    </style>
   </head>
-
   <body class="relative bg-black">
     
     <!-- Background (always behind everything) -->
@@ -21,7 +36,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
     <!-- Foreground content -->
     <div class="relative z-10">
       <Header />
-
       <main class="relative z-20">
         <article class="mx-auto max-w-4xl px-6 py-16">
           {heroImage && (
@@ -29,12 +43,17 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
               <Image width={1020} height={510} src={heroImage} alt="" />
             </div>
           )}
-
+          {techStack && (
+              <div class="tech-stack">
+                {techStack.map((tech: string) => (
+                  <span class="tech-badge">{tech}</span>
+                ))}
+              </div>
+          )}
           <div class="prose prose-invert">
             {pubDate && (
               <div class="date mb-4 text-gray-400 text-sm">
                 <FormattedDate date={pubDate} />
-
                 {updatedDate && (
                   <div class="last-updated-on">
                     Last updated on <FormattedDate date={updatedDate} />
@@ -42,10 +61,8 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
                 )}
               </div>
             )}
-
             <h1>{title}</h1>
             <hr />
-
             <slot />
           </div>
         </article>

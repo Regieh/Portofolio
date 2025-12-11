@@ -3,6 +3,7 @@ title: "Website Showcase — AJM Creation"
 description: "Full showcase of the AJM Creation website: design, tech stack, and visuals."
 pubDate: "2025-5-31"
 heroImage: "../../assets/project/ajm-creation/hero.png"
+techStack: ["Astro", "React", "Tailwind CSS"]
 ---
 
 ## Overview  

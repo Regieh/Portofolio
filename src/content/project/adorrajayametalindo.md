@@ -3,6 +3,7 @@ title: "Website Showcase — Adorra Jaya Metalindo"
 description: "Showcase of Adorra Jaya Metalindo’s company website."
 pubDate: "2025-5-14"
 heroImage: "../../assets/project/adorrajayametalindo/hero.png"
+techStack: ["Astro", "React", "Tailwind CSS"]
 ---
 
 ## Overview  

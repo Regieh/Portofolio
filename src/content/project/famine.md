@@ -3,6 +3,7 @@ title: "Game Showcase — Famine"
 description: "A Unity-based psychological horror game available on the Mac App Store."
 pubDate: "2025-12-11"
 heroImage: "../../assets/project/famine/hero.png"
+techStack: ["Unity"]
 ---
 
 ## Overview  

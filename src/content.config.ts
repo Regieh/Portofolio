@@ -24,6 +24,7 @@ const project = defineCollection({
 		z.object({
 			title: z.string(),
 			description: z.string(),
+			techStack: z.array(z.string()).optional(),
 			// Transform string to Date object
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),

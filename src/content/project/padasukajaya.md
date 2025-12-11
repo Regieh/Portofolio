@@ -3,6 +3,7 @@ title: "Website Showcase — Padasukajaya"
 description: "Showcase of Padasukajaya’s website (mentored project)."
 pubDate: "2025-5-9"
 heroImage: "../../assets/project/padasukajaya/hero.png"
+techStack: ["Astro", "React", "Tailwind CSS"]
 ---
 
 ## Overview  

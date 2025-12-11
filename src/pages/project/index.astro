@@ -81,6 +81,25 @@ const posts = (await getCollection("project")).sort(
 				box-shadow: var(--box-shadow);
 			}
 
+			.tech-stack {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin-top: 0.5rem;
+			}
+
+			ul li:first-child .tech-stack {
+				justify-content: center;
+			}
+			.tech-badge {
+				font-size: 0.75rem;
+				padding: 0.25rem 0.5rem;
+				background: var(--color-accent);
+				color: white;
+				border-radius: 4px;
+				opacity: 0.8;
+			}
+
 			@media (max-width: 720px) {
 				ul {
 					gap: 0.5em;
@@ -121,10 +140,15 @@ const posts = (await getCollection("project")).sort(
 										/>
 									)}
 									<h4 class="title">{post.data.title}</h4>
+									{post.data.techStack && (
+										<div class="tech-stack">
+											{post.data.techStack.map((tech) => (
+												<span class="tech-badge">{tech}</span>
+											))}
+										</div>
+									)}
 									<p class="date">
-										<FormattedDate
-											date={post.data.pubDate}
-										/>
+										<FormattedDate date={post.data.pubDate} />
 									</p>
 								</a>
 							</li>
