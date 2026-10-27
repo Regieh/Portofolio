@@ -1,6 +1,7 @@
 ---
 title: "Game Showcase — Famine"
 description: "A Unity-based psychological horror game available on the Mac App Store."
+category: "game"
 pubDate: "2025-12-11"
 heroImage: "../../assets/project/famine/hero.png"
 techStack: ["Unity"]
@@ -16,6 +17,10 @@ You play as a caretaker living with an elderly woman in a secluded rural house. 
 But the longer you stay, the stranger things become. Shadows shift, routines break, and something else begins to inhabit the home.  
 You must uncover the truth, protect the woman, and escape before it’s too late.
 
+![Hallway Snapshot](../../assets/project/famine/scene1.png)
+![Kitchen Snapshot](../../assets/project/famine/scene2.png)
+![Sittingroom Snapshot](../../assets/project/famine/scene3.png)
+
 ## Tech Stack & Tools  
 - **Unity Engine** (C#)  
 - **URP** for lighting and rendering  
@@ -28,12 +33,6 @@ You must uncover the truth, protect the woman, and escape before it’s too late
 - 🔦 **Lighting-based horror cues**  
 - 🎮 **Minimal UI and immersive storytelling**  
 - 🍎 **Published on the Mac App Store**
-
-## Visual Gallery  
-![Main Menu](../../assets/project/famine/hero.png)  
-![Hallway Snapshot](../../assets/project/famine/scene1.png)  
-![Kitchen Snapshot](../../assets/project/famine/scene2.png)
-![Sittingroom Snapshot](../../assets/project/famine/scene3.png)
 
 ## My Contribution  
 - Lighting, atmosphere, and environment design  

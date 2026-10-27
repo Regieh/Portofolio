@@ -24,11 +24,14 @@ const project = defineCollection({
 		z.object({
 			title: z.string(),
 			description: z.string(),
+			category: z.enum(['app', 'game', 'web']),
 			techStack: z.array(z.string()).optional(),
 			// Transform string to Date object
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
 			heroImage: image().optional(),
+			// Image for list cards when the banner doesn't suit (e.g. a wide logo).
+			cover: image().optional(),
 		}),
 });
 

@@ -1,0 +1,297 @@
+---
+// Shared layout for blog posts and project pages: wide header, full-width
+// hero on a blurred stage, then a sticky "On this page" sidebar + the article.
+import type { MarkdownHeading } from 'astro';
+import type { ImageMetadata } from 'astro';
+import { ArrowLeft } from '@lucide/astro';
+import { Image } from 'astro:assets';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+
+interface Props {
+	title: string;
+	description?: string;
+	pubDate?: Date;
+	updatedDate?: Date;
+	heroImage?: ImageMetadata;
+	techStack?: string[];
+	back?: { label: string; href: string };
+	headings?: MarkdownHeading[];
+}
+
+const { title, description, pubDate, updatedDate, heroImage, techStack, back, headings = [] } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description ?? title} />
+		<style>
+			.article {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: clamp(1.5rem, 4vw, 3rem) var(--gutter) 6rem;
+			}
+			.back {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.35rem;
+				margin-bottom: 1.25rem;
+				font-size: 0.85rem;
+				color: var(--color-secondary);
+				text-decoration: none;
+			}
+			.back:hover {
+				color: var(--color-primary);
+			}
+
+			/* Title left, summary + facts right */
+			.head {
+				display: grid;
+				grid-template-columns: 1.4fr 1fr;
+				align-items: end;
+				gap: 1.5rem clamp(2rem, 5vw, 4rem);
+				margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+			}
+			.head h1 {
+				margin: 0;
+				font-size: clamp(2.4rem, 5.6vw, 4.6rem);
+				line-height: 0.95;
+			}
+			.lede {
+				margin: 0 0 1rem;
+				font-size: 1.1rem;
+				line-height: 1.5;
+			}
+			.facts {
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				gap: 0.4rem 0.6rem;
+				font-family: var(--font-mono);
+				font-size: 0.78rem;
+				color: var(--color-muted);
+			}
+			.tech-badge {
+				padding: 0.2rem 0.65rem;
+				border-radius: 999px;
+				background: var(--surface);
+				color: var(--color-secondary);
+			}
+
+			/* Hero: whole image on a blurred copy of itself */
+			.hero {
+				position: relative;
+				display: grid;
+				place-items: center;
+				height: min(72vh, 46rem);
+				margin-bottom: clamp(2.5rem, 5vw, 4rem);
+				overflow: hidden;
+				border-radius: var(--radius-lg);
+				background: var(--image-frame);
+			}
+			.hero :global(.backdrop) {
+				position: absolute;
+				inset: -10%;
+				width: 120%;
+				max-width: none;
+				height: 120%;
+				object-fit: cover;
+				filter: blur(36px) saturate(1.3);
+				opacity: 0.85;
+			}
+			.hero :global(.shot) {
+				position: relative;
+				max-width: 88%;
+				max-height: 86%;
+				width: auto;
+				height: auto;
+				border-radius: var(--radius);
+				box-shadow: 0 30px 60px -25px rgba(0, 0, 0, 0.55);
+			}
+
+			/* Body: each section is a card in a bento grid.
+			   Short sections pair up; long text and galleries span the row. */
+			.prose {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 1rem;
+				font-size: 1.02rem;
+			}
+			.prose > :global(*:not(.block)) {
+				grid-column: 1 / -1;
+			}
+			.prose :global(.block) {
+				padding: clamp(1.25rem, 2.5vw, 2rem);
+				border-radius: var(--radius-lg);
+				background: var(--paper-raised);
+				box-shadow: 0 0 0 1px rgba(var(--ink-rgb), 0.05);
+			}
+			.prose :global(.block.wide) {
+				grid-column: 1 / -1;
+			}
+			.prose :global(.block > :last-child) {
+				margin-bottom: 0;
+			}
+			.prose :global(.block > h1:first-child),
+			.prose :global(.block > h2:first-child) {
+				margin: 0 0 0.9rem;
+				font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+			}
+			.prose :global(.block h2:not(:first-child)),
+			.prose :global(.block h3) {
+				margin: 1.5rem 0 0.5rem;
+				font-size: 1.15rem;
+			}
+			/* Wide text-only cards: heading left, content right */
+			.prose :global(.block.wide:not(:has(img))) {
+				display: grid;
+				grid-template-columns: minmax(12rem, 0.42fr) 1fr;
+				column-gap: clamp(1.5rem, 4vw, 3.5rem);
+				align-items: start;
+			}
+			.prose :global(.block.wide:not(:has(img)) > :first-child) {
+				grid-row: 1 / span 99;
+				position: sticky;
+				top: calc(var(--header-h) + 1rem);
+			}
+			.prose :global(.block.wide:not(:has(img)) > :not(:first-child)) {
+				grid-column: 2;
+			}
+			.prose :global(.block.wide:not(:has(img)) > :nth-child(2)) {
+				margin-top: 0.35rem;
+			}
+			.prose :global(ul) {
+				margin-bottom: 0;
+			}
+			.prose :global(img) {
+				display: block;
+				width: 100%;
+				margin: 0.5rem 0;
+			}
+			/* Galleries between the cards, laid out by image count.
+			   Images are never cropped: they sit whole on a soft tile. */
+			.prose :global(.gallery) {
+				grid-column: 1 / -1;
+				display: grid;
+				grid-template-columns: repeat(6, 1fr);
+				grid-auto-rows: clamp(12rem, 22vw, 18rem);
+				gap: 1rem;
+			}
+			.prose :global(.gallery img) {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: clamp(0.5rem, 1.2vw, 1rem);
+				object-fit: contain;
+				border-radius: var(--radius-lg);
+				background: var(--surface);
+				grid-column: span 6;
+				transition: scale 0.5s var(--ease-out);
+			}
+			.prose :global(.gallery img:hover) {
+				scale: 1.02;
+			}
+			.prose :global(.gallery-title) {
+				grid-column: 1 / -1;
+				margin: 1.25rem 0 0;
+				font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+			}
+			/* 1: one large image */
+			.prose :global(.g-1) {
+				grid-auto-rows: clamp(16rem, 40vw, 34rem);
+			}
+			/* 2: side by side */
+			.prose :global(.g-2 img) {
+				grid-column: span 3;
+			}
+			/* 3: one big, two stacked */
+			.prose :global(.g-3 img) {
+				grid-column: span 2;
+			}
+			.prose :global(.g-3 img:first-child) {
+				grid-column: span 4;
+				grid-row: span 2;
+			}
+			/* 4: 2 x 2 */
+			.prose :global(.g-4 img) {
+				grid-column: span 3;
+			}
+			/* 5: two big on top, three below */
+			.prose :global(.g-5 img) {
+				grid-column: span 2;
+			}
+			.prose :global(.g-5 img:nth-child(-n + 2)) {
+				grid-column: span 3;
+			}
+			/* 6 (and more): rows of three */
+			.prose :global(.g-6 img) {
+				grid-column: span 2;
+			}
+
+			@media (max-width: 900px) {
+				.head,
+				.prose {
+					grid-template-columns: 1fr;
+				}
+				.prose :global(.block.wide:not(:has(img))) {
+					display: block;
+				}
+				.prose :global(.gallery) {
+					grid-template-columns: 1fr 1fr;
+					grid-auto-rows: 11rem;
+				}
+				.prose :global(.gallery img),
+				.prose :global(.g-3 img:first-child) {
+					grid-column: span 1;
+					grid-row: span 1;
+				}
+				.prose :global(.gallery img:first-child:nth-last-child(odd)) {
+					grid-column: span 2;
+				}
+				.hero {
+					height: auto;
+					aspect-ratio: 4 / 3;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<article class="article">
+			{back && (
+				<a class="back" href={back.href}>
+					<ArrowLeft size={14} aria-hidden="true" /> {back.label}
+				</a>
+			)}
+			<div class="head">
+				<h1>{title}</h1>
+				<div>
+					{description && <p class="lede">{description}</p>}
+					<div class="facts">
+						{pubDate && <FormattedDate date={pubDate} />}
+						{updatedDate && (
+							<span>
+								Updated <FormattedDate date={updatedDate} />
+							</span>
+						)}
+						{techStack?.map((tech) => <span class="tech-badge">{tech}</span>)}
+					</div>
+				</div>
+			</div>
+
+			{heroImage && (
+				<div class="hero">
+					<Image class="backdrop" src={heroImage} width={160} alt="" />
+					<Image class="shot" src={heroImage} width={1600} alt="" />
+				</div>
+			)}
+
+			<div class="prose">
+				<slot />
+			</div>
+		</article>
+		<Footer />
+	</body>
+</html>

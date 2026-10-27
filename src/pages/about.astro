@@ -1,17 +1,51 @@
 ---
-import Layout from '../layouts/BlogPost.astro';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Timeline from '../components/Timeline.astro';
+import { SITE_TITLE } from '../consts';
+import { TIMELINE } from '../data/timeline';
 ---
 
-<Layout
-  title="About Me"
-  description="Lorem ipsum dolor sit amet"
-  pubDate={new Date('December 10 2025')}
->
-  <p>
-    Hi, I’m Raphael Gregorius, a Distinction Computer Science graduate with experience across iOS development, backend engineering, machine learning, and full-stack development. I’ve built production-ready apps and systems through roles at Apple Developer Academy, Paper.id, and Bangkit, working with technologies like Swift, Golang, Node.js, Unity, and Astro.
-  </p>
-
-  <p>
-    Over the past few years, I’ve led technical teams, shipped real products, and collaborated across design, product, and engineering to deliver polished, user-focused solutions. My work ranges from iOS apps and IoT systems to 3D games and machine learning pipelines.
-  </p>
-</Layout>
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`About · ${SITE_TITLE}`} description="My journey so far." />
+		<style>
+			main {
+				width: 900px;
+				padding-bottom: 8rem;
+			}
+			.intro {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 1.5rem;
+				margin-bottom: 4rem;
+			}
+			.intro h1 {
+				margin: 0;
+			}
+			.intro p {
+				max-width: 40rem;
+				font-size: 0.95rem;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="intro" data-reveal>
+				<p class="eyebrow">About</p>
+				<h1>My <em>journey</em>,<br />so far.</h1>
+				<p>
+					Hi, I’m Raphael Gregorius, a <mark>Distinction Computer Science graduate</mark> with experience across iOS
+					development, backend engineering, machine learning, and full-stack development. I’ve built
+					production-ready apps and systems through roles at Apple Developer Academy, Paper.id, and
+					Bangkit, working with technologies like Swift, Golang, Node.js, Unity, and Astro.
+				</p>
+			</section>
+			<Timeline entries={TIMELINE} />
+		</main>
+		<Footer />
+	</body>
+</html>

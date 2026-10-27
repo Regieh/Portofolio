@@ -1,0 +1,407 @@
+---
+import { ArrowUpRight, Play } from '@lucide/astro';
+import { Image } from 'astro:assets';
+import type { TimelineEntry } from '../data/timeline';
+
+interface Props {
+	entries: TimelineEntry[];
+}
+
+const { entries } = Astro.props;
+const PLACEHOLDER_TILES = 3;
+
+// Split "text with ==highlights==" into plain and highlighted parts.
+const highlight = (text: string) =>
+	text.split(/==(.+?)==/g).map((part, i) => ({ text: part, marked: i % 2 === 1 }));
+const plain = (text?: string) => text?.replace(/==/g, '');
+---
+
+<ol class="timeline" data-timeline>
+	<li class="progress" aria-hidden="true" />
+	{entries.map((entry) => (
+		<li class:list={['entry', { active: entry.active }]} data-reveal>
+			<span class="dot" aria-hidden="true" />
+			<p class="date">{entry.date}</p>
+			<h3 class="title">{entry.title}</h3>
+			{entry.description && (
+				<p class="description">
+					{highlight(entry.description).map((part) => (part.marked ? <mark>{part.text}</mark> : part.text))}
+				</p>
+			)}
+			{entry.links && (
+				<div class="links">
+					{entry.links.map((link) => (
+						<a class="link" href={link.href} target="_blank" rel="noopener">
+							{link.label}
+							<ArrowUpRight size={14} aria-hidden="true" />
+						</a>
+					))}
+				</div>
+			)}
+			<div class="tiles">
+				{entry.media.length > 0
+					? entry.media.map((item) => (
+							<figure class="shot">
+								{'video' in item ? (
+									<a
+										class="tile"
+										href={item.video}
+										data-lightbox="video"
+										data-caption={plain(item.caption)}
+										aria-label={item.alt}
+									>
+										<video
+											src={item.video}
+											poster={item.poster}
+											autoplay
+											muted
+											loop
+											playsinline
+											preload="metadata"
+											aria-hidden="true"
+										/>
+										<span class="play-badge" aria-hidden="true">
+											<Play size={10} fill="currentColor" />
+										</span>
+									</a>
+								) : (
+									<a class="tile" href={item.src.src} data-lightbox data-caption={plain(item.caption)}>
+										<Image src={item.src} height={340} alt={item.alt} />
+									</a>
+								)}
+								{item.caption && (
+									<figcaption>
+										{highlight(item.caption).map((part) => (part.marked ? <mark>{part.text}</mark> : part.text))}
+									</figcaption>
+								)}
+							</figure>
+						))
+					: Array.from({ length: PLACEHOLDER_TILES }, () => <div class="tile placeholder" />)}
+			</div>
+		</li>
+	))}
+</ol>
+
+<style>
+	.timeline {
+		--line-inactive: #dcd8cc;
+		--line-active: var(--gradient-timeline);
+
+		position: relative;
+		list-style: none;
+		margin: 0;
+		padding: 0 0 0 2.5rem;
+	}
+
+	/* Colored line that fills as you scroll (height set by interactions.ts) */
+	.progress {
+		position: absolute;
+		top: 0.95rem;
+		height: 0;
+		left: 0.55rem;
+		width: 3px;
+		border-radius: 3px;
+		z-index: 1;
+		background: var(--line-active);
+		clip-path: inset(0 0 calc(100% - var(--progress, 100%)) 0);
+		transition: clip-path 0.15s linear;
+	}
+
+	:global(.js) .progress {
+		--progress: 0px;
+	}
+
+	.entry {
+		position: relative;
+		padding-bottom: 3rem;
+	}
+
+	/* Line segment from this entry's dot down to the next one (none after the last) */
+	.entry:last-child {
+		padding-bottom: 0;
+	}
+
+	.entry:last-child::before {
+		display: none;
+	}
+
+	.entry::before {
+		content: '';
+		position: absolute;
+		top: 0.6rem;
+		bottom: -0.6rem;
+		left: calc(-2.5rem + 0.55rem);
+		width: 3px;
+		border-radius: 3px;
+		background: var(--line-inactive);
+	}
+
+	.dot {
+		position: absolute;
+		top: 0.35rem;
+		left: -2.5rem;
+		width: 1.25rem;
+		height: 1.25rem;
+		border-radius: 50%;
+		background: var(--line-inactive);
+		border: 3px solid var(--paper);
+		z-index: 2;
+		transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	/* Entries the scroll has reached light up; the rest stay grey */
+	.entry.reached .dot,
+	:global(html:not(.js)) .entry .dot {
+		background: linear-gradient(135deg, #ffc371, #4ea3ff);
+		transform: scale(1.1);
+	}
+
+	.entry.active .dot {
+		background: linear-gradient(135deg, #ff5f6d, #ffc371);
+		box-shadow: 0 0 0 4px rgba(255, 95, 109, 0.2), 0 0 18px rgba(255, 195, 113, 0.5);
+	}
+
+	.date {
+		margin: 0;
+		font-size: 0.8em;
+		color: var(--color-secondary);
+	}
+
+	.date,
+	.title,
+	.description {
+		transition: color 0.4s ease;
+	}
+
+	.entry.reached .date,
+	:global(html:not(.js)) .entry .date {
+		color: var(--color-accent);
+	}
+
+	.title {
+		margin: 0.1rem 0 0.25rem;
+		font-size: 1.15em;
+	}
+
+	:global(.js) .entry:not(.reached) .title {
+		color: #a9a69d;
+	}
+
+	:global(.js) .entry:not(.reached) .description,
+	:global(.js) .entry:not(.reached) .date {
+		color: #bcb9b0;
+	}
+
+	.description {
+		margin: 0;
+		font-size: 0.9em;
+	}
+
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 0.9rem;
+	}
+
+	.link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.35rem 0.85rem;
+		border-radius: 999px;
+		background: var(--paper-raised);
+		box-shadow: inset 0 0 0 1px var(--color-border);
+		color: var(--color-primary);
+		font-size: 0.78rem;
+		font-weight: 500;
+		line-height: 1.3;
+		text-decoration: none;
+		transition: background 0.2s ease, color 0.2s ease;
+	}
+
+	.link:hover {
+		background: var(--ink);
+		color: var(--paper);
+	}
+
+	.link :global(svg) {
+		flex-shrink: 0;
+		transition: translate 0.3s var(--ease-spring);
+	}
+
+	.link:hover :global(svg) {
+		translate: 2px -2px;
+	}
+
+	.tiles {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		gap: 1rem 0.75rem;
+		margin-top: 1.25rem;
+	}
+
+	/* A picture plus its 1–2 line story; the caption wraps to the picture's width */
+	.shot {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		width: min-content;
+		margin: 0;
+	}
+
+	/* Pictures with a story get room for ~2 lines beside narrow images */
+	.shot:has(figcaption) {
+		min-width: 15rem;
+		max-width: 22rem;
+	}
+
+	.shot figcaption {
+		margin-top: 0.5rem;
+		font-size: 0.72rem;
+		line-height: 1.45;
+		color: var(--color-secondary);
+		transition: color 0.4s ease;
+	}
+
+	:global(.js) .entry:not(.reached) .shot figcaption {
+		color: #bcb9b0;
+	}
+
+	.tile {
+		--tile-h: 8.5rem;
+		display: block;
+		height: var(--tile-h);
+		overflow: hidden;
+		border-radius: var(--radius-sm);
+		background: var(--surface-muted);
+		cursor: zoom-in;
+		transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease;
+	}
+
+	.tile:hover {
+		transform: translateY(-4px) scale(1.04);
+		border-color: var(--color-secondary);
+	}
+
+	.tile {
+		position: relative;
+	}
+
+	.tile :global(img),
+	.tile video {
+		display: block;
+		height: var(--tile-h);
+		width: auto;
+		max-width: none;
+		border-radius: 0;
+		transition: filter 0.6s ease, opacity 0.6s ease;
+	}
+
+	/* Past entries are muted until hovered */
+	:global(.js) .entry:not(.reached) .tile :global(img),
+	:global(.js) .entry:not(.reached) .tile video {
+		filter: grayscale(1) contrast(0.8);
+		opacity: 0.55;
+	}
+
+	:global(.js) .entry:not(.reached) .tile:hover :global(img),
+	:global(.js) .entry:not(.reached) .tile:hover video {
+		filter: none;
+		opacity: 1;
+	}
+
+	.play-badge {
+		position: absolute;
+		right: 0.4rem;
+		bottom: 0.4rem;
+		display: grid;
+		place-items: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: 50%;
+		font-size: 0.55rem;
+		color: #fff;
+		background: rgba(var(--ink-rgb), 0.55);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+	}
+
+	.tile.placeholder {
+		width: 12rem;
+		background: repeating-linear-gradient(
+			45deg,
+			#ebe7dc,
+			#ebe7dc 8px,
+			#e3dfd3 8px,
+			#e3dfd3 16px
+		);
+	}
+
+	/* The current entry is the headline of the journey: everything bigger */
+	.entry.active {
+		padding-bottom: 4.5rem;
+	}
+
+	.entry.active .dot {
+		top: 0.55rem;
+		left: calc(-2.5rem - 0.3rem);
+		width: 1.85rem;
+		height: 1.85rem;
+	}
+
+	.entry.active .date {
+		font-size: 0.95em;
+	}
+
+	.entry.active .title {
+		font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+		margin-bottom: 0.5rem;
+	}
+
+	.entry.active .description {
+		font-size: 1.05em;
+	}
+
+	.entry.active .tile {
+		--tile-h: 13rem;
+		border-radius: var(--radius);
+	}
+
+	/* Bigger pictures sit in one swipeable strip instead of wrapping */
+	.entry.active .tiles {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: none;
+		padding: 0.25rem 2rem 0.75rem 0;
+		margin-right: calc(-1 * var(--gutter));
+		mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent);
+	}
+
+	.entry.active .tiles::-webkit-scrollbar {
+		display: none;
+	}
+
+	.entry.active .shot {
+		flex-shrink: 0;
+		scroll-snap-align: start;
+	}
+
+	.entry.active .shot:has(figcaption) {
+		max-width: 26rem;
+	}
+
+	@media (max-width: 720px) {
+		.tile {
+			--tile-h: 6rem;
+		}
+		.entry.active .tile {
+			--tile-h: 9rem;
+		}
+		.tile.placeholder {
+			width: 8.5rem;
+		}
+	}
+</style>

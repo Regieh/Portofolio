@@ -1,6 +1,7 @@
 ---
 title: "Website Showcase — Triabi"
 description: "Showcase of Triabi website — product catalogue & presentation."
+category: "web"
 pubDate: "2025-7-17"
 heroImage: "../../assets/project/triabi/hero.png"
 techStack: ["Astro", "React", "Tailwind CSS"]

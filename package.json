@@ -13,6 +13,7 @@
     "@astrojs/react": "^4.4.2",
     "@astrojs/rss": "^4.0.12",
     "@astrojs/sitemap": "^3.4.2",
+    "@lucide/astro": "^1.52.0",
     "@tailwindcss/vite": "^4.1.17",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -20,6 +21,7 @@
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "sharp": "^0.34.2",
+    "sharp-ico": "^0.1.5",
     "tailwindcss": "^4.1.17"
   }
 }

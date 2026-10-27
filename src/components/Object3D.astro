@@ -1,0 +1,66 @@
+---
+// A Kyoto YouMe-style striped 3D object: the same Lucide icon stacked in
+// depth so its extruded sides read as stripes. Rotation is driven by scroll
+// and pointer in src/scripts/interactions.ts ([data-object]).
+import type { AstroComponent } from '@lucide/astro';
+
+interface Props {
+	icon: AstroComponent;
+	layers?: number;
+	/** Distance between layers, in px at full size. */
+	gap?: number;
+	strokeWidth?: number;
+	class?: string;
+}
+
+const { icon: Icon, layers = 8, gap = 14, strokeWidth = 0.55, class: className } = Astro.props;
+const offsets = Array.from({ length: layers }, (_, i) => (i - (layers - 1) / 2) * gap);
+---
+
+<div class:list={['stage', className]} data-object aria-hidden="true">
+	<div class="object">
+		{offsets.map((z) => (
+			<Icon
+				class="layer"
+				size="100%"
+				stroke-width={strokeWidth}
+				style={`--z: ${z}px`}
+			/>
+		))}
+	</div>
+</div>
+
+<style>
+	.stage {
+		--ox: -20deg;
+		--oy: 35deg;
+		--oz: 0deg;
+		width: min(46vmin, 420px);
+		aspect-ratio: 1;
+		perspective: 1400px;
+	}
+
+	.object {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		transform-style: preserve-3d;
+		transform: rotateX(var(--ox)) rotateY(var(--oy)) rotateZ(var(--oz));
+		will-change: transform;
+	}
+
+	.object :global(.layer) {
+		position: absolute;
+		inset: 0;
+		/* Thin outlines spaced apart: the sides read as stripes */
+		color: var(--ink);
+		transform: translateZ(var(--z));
+		backface-visibility: visible;
+	}
+
+	@media (max-width: 720px) {
+		.stage {
+			width: 62vw;
+		}
+	}
+</style>

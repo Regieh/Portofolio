@@ -1,85 +1,173 @@
 ---
-import { SITE_TITLE } from '../consts';
+import { ChevronDown } from '@lucide/astro';
+import { CATEGORIES, SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
+
+// On the home page the hero already shows the name big, so the header
+// becomes just a floating nav pill over the page.
+const isHome = Astro.url.pathname === '/';
 ---
 
-<header class="m-0 px-4">
-	<nav class="flex items-center justify-between">
-		<div>
-			<h2><a href="/" class="site-title">{SITE_TITLE}</a></h2>
-		</div>
+<header class:list={['site-header', { floating: isHome }]}>
+	<nav>
+		{!isHome && <a href="/" class="site-title">{SITE_TITLE}</a>}
 
-		<div class="internal-links flex gap-2">
-			<HeaderLink href="/">Home</HeaderLink>
-			<HeaderLink href="/project">Project</HeaderLink>
+		<div class="internal-links">
+			<div class="dropdown">
+				<HeaderLink href="/" match={['', 'portfolio', 'project']} aria-haspopup="true">
+					Portfolio <ChevronDown class="chevron" size={14} aria-hidden="true" />
+				</HeaderLink>
+				<ul class="menu">
+					{CATEGORIES.map((category) => (
+						<li><a href={`/portfolio/${category.slug}/`}>{category.label}</a></li>
+					))}
+				</ul>
+			</div>
 			<HeaderLink href="/blog">Blog</HeaderLink>
 			<HeaderLink href="/about">About</HeaderLink>
-		</div>
-
-		<div class="social-links">
-			<a href="https://github.com/regieh" target="_blank">
-				<span class="sr-only">Go to Raphael Gregorius's GitHub repo</span>
-				<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32"
-					><path
-						fill="currentColor"
-						d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-					></path></svg
-				>
-			</a>
 		</div>
 	</nav>
 </header>
 
 <style>
-	:root {
-		--color-primary: #ffffff;
-		--color-secondary: #b4b4b8;
-		--color-accent: #4ea3ff;
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 40;
+		box-sizing: border-box;
+		height: var(--header-h);
+		display: flex;
+		align-items: center;
+		padding: 0 var(--gutter);
+		background: color-mix(in srgb, var(--paper) 82%, transparent);
+		backdrop-filter: saturate(160%) blur(16px);
+		-webkit-backdrop-filter: saturate(160%) blur(16px);
+		font-size: 1rem;
 	}
 
-	h2 {
-		margin: 0;
-		font-size: 1em;
+	/* Home: no bar, no name; the nav pill floats top right */
+	.site-header.floating {
+		position: fixed;
+		inset: 0 0 auto;
+		height: auto;
+		padding-top: clamp(1rem, 2.5vw, 1.75rem);
+		background: none;
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+		pointer-events: none;
 	}
 
-	/* Title */
+	.site-header.floating nav {
+		justify-content: flex-end;
+	}
+
+	.site-header.floating .internal-links {
+		pointer-events: auto;
+		box-shadow:
+			inset 0 0 0 1px var(--color-border),
+			0 10px 30px -18px rgba(var(--ink-rgb), 0.35);
+	}
+
+	nav {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
 	.site-title {
+		white-space: nowrap;
+		font-size: 1.3rem;
+		font-weight: 800;
+		letter-spacing: -0.04em;
 		color: var(--color-primary);
 		text-decoration: none;
 	}
 
-	/* Default nav link style */
-	nav a {
-		color: var(--color-secondary);           /* gray */
-		padding: 1em 0.5em;
-		border-bottom: 3px solid transparent;
-		text-decoration: none;
-		transition: color 0.2s ease;
+	/* Links sit in one soft pill; the current page is a filled pill */
+	.internal-links {
+		display: flex;
+		align-items: center;
+		gap: 0.2rem;
+		padding: 0.3rem;
+		border-radius: 999px;
+		background: var(--paper-raised);
+		box-shadow: inset 0 0 0 1px var(--color-border);
 	}
 
-	/* Hover */
-	nav a:hover {
-		color: var(--color-primary);             /* white on hover */
+	.dropdown {
+		position: relative;
 	}
 
-	/* Active link */
-	nav a.active {
-		color: var(--color-primary);             /* white */
-		border-bottom-color: var(--color-accent);/* blue underline */
+	.dropdown :global(.chevron) {
+		display: inline;
+		vertical-align: -2px;
+		transition: transform 0.25s var(--ease-out);
 	}
 
-	/* GitHub icon */
-	.github-link {
+	.dropdown:hover :global(.chevron),
+	.dropdown:focus-within :global(.chevron) {
+		transform: rotate(180deg);
+	}
+
+	/* Menu shows on hover or keyboard focus; no JS needed */
+	.menu {
+		position: absolute;
+		top: calc(100% + 0.6rem);
+		left: -0.75rem;
+		z-index: 30;
+		min-width: 9rem;
+		margin: 0;
+		padding: 0.4rem 0;
+		list-style: none;
+		background: var(--paper-raised);
+		border-radius: var(--radius);
+		box-shadow: 0 18px 40px -20px rgba(var(--ink-rgb), 0.35), 0 0 0 1px var(--color-border);
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(4px);
+		transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+	}
+
+	/* Bridge the gap so the menu doesn't close while moving to it */
+	.menu::before {
+		content: '';
+		position: absolute;
+		inset: -0.7rem 0 auto;
+		height: 0.7rem;
+	}
+
+	.dropdown:hover .menu,
+	.dropdown:focus-within .menu {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+	}
+
+	.menu a {
+		display: block;
+		margin: 0 0.3rem;
+		padding: 0.4rem 0.7rem;
+		border-radius: var(--radius-sm);
 		color: var(--color-primary);
-		display: flex;
+		text-decoration: none;
 	}
 
-	.social-links {
-		display: flex;
+	.menu a:hover,
+	.menu a:focus-visible {
+		background: var(--ink);
+		color: var(--paper);
 	}
 
 	@media (max-width: 720px) {
-		.social-links {
+		.site-header {
+			font-size: 0.85rem;
+		}
+		.site-title {
+			font-size: 0.95rem;
+			letter-spacing: -0.03em;
+		}
+		.menu {
 			display: none;
 		}
 	}

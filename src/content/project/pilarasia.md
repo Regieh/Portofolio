@@ -1,6 +1,7 @@
 ---
 title: "Website Showcase — Pilarasia"
 description: "Showcase of Pilarasia website — corporate/business platform front-end."
+category: "web"
 pubDate: "2025-4-11"
 heroImage: "../../assets/project/pilarasia/hero.png"
 techStack: ["Astro", "React", "Tailwind CSS"]
